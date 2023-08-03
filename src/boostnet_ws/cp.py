@@ -17,8 +17,6 @@ CHARGE_POINT_EXCHANGE = "charge-point"
 
 CHARGER_REPLY_TIMEOUT_SECONDS = 30
 
-CHARGER_COMMAND_DELAY_MS = 1000
-
 
 class ChargePointClient:
     def __init__(self, charge_point_id: str, websocket: WebSocket):
@@ -72,10 +70,7 @@ class ChargePointClient:
             await self.websocket.send_json(charge_point_message)
         # for commands from server, enqueue and send serially, waiting for a reply after each
         else:
-            command_message = Message(
-                json.dumps(charge_point_message).encode(),
-                headers={"x-delay": CHARGER_COMMAND_DELAY_MS},
-            )
+            command_message = Message(json.dumps(charge_point_message).encode())
             ack = await self._exchange.publish(command_message, self._command_queue)
             logger.info(
                 "OUTQ: CP %s",
@@ -90,11 +85,7 @@ class ChargePointClient:
     async def consume_command_queue(self):
         logger.debug("START: CP consumer %s", self._charge_point_id)
         command_queue = await ctx.amqp_channel.declare_queue(self._command_queue)
-        self._exchange = await ctx.amqp_channel.declare_exchange(
-            CHARGE_POINT_EXCHANGE,
-            "x-delayed-message",
-            arguments={"x-delayed-type": "direct"},
-        )
+        self._exchange = await ctx.amqp_channel.declare_exchange(CHARGE_POINT_EXCHANGE)
         await command_queue.bind(self._exchange)
         while not any([ctx.shutdown_event.is_set(), self._disconnect_event.is_set()]):
             async with command_queue.iterator() as queue_iter:
