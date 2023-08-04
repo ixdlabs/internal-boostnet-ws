@@ -16,4 +16,4 @@ class SerializableEnum(Enum):
 class MessageType(SerializableEnum):
     call = 2
     call_result = 3
-    call_error = 3
+    call_error = 4
