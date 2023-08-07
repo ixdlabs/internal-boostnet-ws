@@ -9,6 +9,9 @@ logger = logging.getLogger(__name__)
 
 async def rpc_recv_queue_consumer():
     logger.info("START: RPC iterator")
+    assert ctx.rpc_recv_queue is not None
+    assert ctx.shutdown_event is not None
+
     async with ctx.rpc_recv_queue.iterator() as queue_iter:
         async for message in cancellable_iterator(queue_iter, ctx.shutdown_event):
             async with message.process():

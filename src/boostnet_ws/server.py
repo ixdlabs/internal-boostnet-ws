@@ -24,6 +24,10 @@ class MainWebsocket(WebSocketEndpoint):
     encoding = "json"
 
     async def _rpc_send(self, msg: dict):
+        assert ctx.rpc_recv_queue is not None
+        assert ctx.rpc_send_queue is not None
+        assert ctx.amqp_channel is not None
+
         msg["queue"] = ctx.rpc_recv_queue.name
         rpc_message = Message(
             json.dumps(msg).encode(),
@@ -76,12 +80,15 @@ class MainWebsocket(WebSocketEndpoint):
             subprotocol=websocket.headers.get("sec-websocket-protocol")
         )
         if charge_point_id in ctx.clients:
+            websocket_host = ctx.clients[charge_point_id].websocket
+            assert websocket_host.client is not None
+
             logger.warning(
                 "ERR: WS: already connected %s",
                 dict(
                     cp=charge_point_id,
-                    ws=id(ctx.clients[charge_point_id].websocket),
-                    host=ctx.clients[charge_point_id].websocket.client.host,
+                    ws=id(websocket_host),
+                    host=websocket_host.client.host,
                 ),
             )
             await ctx.clients[charge_point_id].disconnect()
@@ -97,6 +104,7 @@ class MainWebsocket(WebSocketEndpoint):
                 "Charge point %s on_disconnect: connection not found",
                 charge_point_id,
             )
+            return
         await client.disconnect()
         await self._rpc_send(dict(type="disconnect", id=charge_point_id))
 

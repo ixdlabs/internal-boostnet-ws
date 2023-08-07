@@ -1,4 +1,6 @@
 import dataclasses
+from typing import TYPE_CHECKING
+
 from asyncio import Event
 from typing import Optional, Dict
 
@@ -7,10 +9,13 @@ from aio_pika.abc import (
     AbstractRobustQueue,
 )
 
+if TYPE_CHECKING:
+    from .cp import ChargePointClient
+
 
 @dataclasses.dataclass
 class GlobalContext:
-    clients: Dict[str, any]
+    clients: Dict[str, "ChargePointClient"]
     amqp_channel: Optional[AbstractRobustChannel] = None
     rpc_recv_queue: Optional[AbstractRobustQueue] = None
     rpc_send_queue: Optional[AbstractRobustQueue] = None

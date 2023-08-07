@@ -17,7 +17,7 @@ async def cancellable_iterator(
     ]
     result_iter = async_iterator.__aiter__()
     while not any([event.is_set() for event in cancellation_events]):
-        iter_next_task = asyncio.create_task(result_iter.__anext__())
+        iter_next_task = asyncio.create_task(result_iter.__anext__())  # type: ignore
         done, pending = await asyncio.wait(
             [*cancellation_tasks, iter_next_task], return_when=asyncio.FIRST_COMPLETED
         )

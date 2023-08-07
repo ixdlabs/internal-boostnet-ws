@@ -29,6 +29,8 @@ class ChargePointClient:
         self._consume_task = asyncio.create_task(self.consume_command_queue())
 
     async def disconnect(self):
+        assert self._consume_task is not None
+
         self._disconnect_event.set()
         await self._consume_task
         self._consume_task = None
@@ -70,6 +72,8 @@ class ChargePointClient:
             await self.websocket.send_json(charge_point_message)
         # for commands from server, enqueue and send serially, waiting for a reply after each
         else:
+            assert self._exchange is not None
+
             command_message = Message(json.dumps(charge_point_message).encode())
             ack = await self._exchange.publish(command_message, self._command_queue)
             logger.info(
@@ -83,6 +87,9 @@ class ChargePointClient:
             )
 
     async def consume_command_queue(self):
+        assert ctx.amqp_channel is not None
+        assert ctx.shutdown_event is not None
+
         logger.debug("START: CP consumer %s", self._charge_point_id)
         command_queue = await ctx.amqp_channel.declare_queue(self._command_queue)
         self._exchange = await ctx.amqp_channel.declare_exchange(CHARGE_POINT_EXCHANGE)
