@@ -1,0 +1,12 @@
+{
+    "AWSEBDockerrunVersion": "1",
+    "Image": {
+      "Name": "xxxxxx.dkr.ecr.ap-south-1.amazonaws.com/docker-test-app:bed18bdcfa15e77c02a021eb5396add9fe5679e2",
+      "Update": "true"
+    },
+    "Ports": [
+      {
+        "ContainerPort": 3000
+      }
+    ]
+  }
