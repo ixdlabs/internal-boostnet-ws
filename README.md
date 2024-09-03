@@ -25,5 +25,5 @@ docker run -p 5672:5672 -p 15672:15672 -d --name rabmqcon -e RABBITMQ_DEFAULT_US
 
 #### boostnet-ws
 ```shell
-docker run -p 80:3000 -d --name boostnet-ws-con -e AMQP_URL='amqp://user:userpassword@rabbitmqserverip:5672/%2F?connection_attempts=20&retry_delay=1' boostnet-ws
+docker run -p 80:3000 -d --name boostnet-ws-con -e AMQP_URL='amqp://user:userpassword@rabbitmqserverip:5672' boostnet-ws
 ```
