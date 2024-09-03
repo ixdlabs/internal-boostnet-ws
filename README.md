@@ -17,7 +17,7 @@ pip install -r requirements.txt
 PYTHONPATH=src python main.py
 ```
 
-### deploymment commands
+### Deploymment Commands
 #### rabbitmq
 ```shell
 docker run -p 5672:5672 -p 15672:15672 -d --name rabmqcon -e RABBITMQ_DEFAULT_USER=super*** -e RABBITMQ_DEFAULT_PASS=********** rabbitmq:3-management
